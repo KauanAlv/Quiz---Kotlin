@@ -45,10 +45,46 @@ class QuizViewModel : ViewModel() {
             titulo = "Quando o Brasil foi descoberto?",
             opcoes = listOf("1805", "1950", "1500", "1450"),
             respostaCorreta = "1500"
+        ),
+        Pergunta(
+            id = 5,
+            titulo = "Qual é o maior planeta do Sistema Solar?",
+            opcoes = listOf("Terra", "Marte", "Júpiter", "Saturno"),
+            respostaCorreta = "Júpiter"
+        ),
+        Pergunta(
+            id = 6,
+            titulo = "Quantos lados tem um hexágono?",
+            opcoes = listOf("6", "5", "8", "4"),
+            respostaCorreta = "6"
+        ),
+        Pergunta(
+            id = 7,
+            titulo = "Qual animal é conhecido como o rei da selva?",
+            opcoes = listOf("Tigre", "Elefante", "Lobo", "Leão"),
+            respostaCorreta = "Leão"
+        ),
+        Pergunta(
+            id = 8,
+            titulo = "Qual é a fórmula química da água?",
+            opcoes = listOf("CO2", "H2O", "O2", "NaCl"),
+            respostaCorreta = "H2O"
+        ),
+        Pergunta(
+            id = 9,
+            titulo = "Em qual continente fica o Egito?",
+            opcoes = listOf("Ásia", "Europa", "África", "Oceania"),
+            respostaCorreta = "África"
+        ),
+        Pergunta(
+            id = 10,
+            titulo = "Quem pintou a Mona Lisa?",
+            opcoes = listOf("Leonardo da Vinci", "Pablo Picasso", "Van Gogh", "Michelangelo"),
+            respostaCorreta = "Leonardo da Vinci"
         )
     ).shuffled()
 
-    var uiState by mutableStateOf(estadoDaPergunta(indice = 0, pontos = 0))
+    var estadoGeral by mutableStateOf(estadoDaPergunta(indice = 0, pontos = 0))
         private set
 
     private fun estadoDaPergunta(indice: Int, pontos: Int): QuizUiState {
@@ -63,13 +99,13 @@ class QuizViewModel : ViewModel() {
     }
 
     fun selecionarOpcao(opcao: String) {
-        val estado = uiState
+        val estado = estadoGeral
         if (estado.opcaoSelecionada != null || estado.finalizado) return
 
         val acertou = opcao == estado.perguntaAtual.respostaCorreta
         val novosPontos = if (acertou) estado.pontos + 1 else estado.pontos
 
-        uiState = estado.copy(opcaoSelecionada = opcao, pontos = novosPontos)
+        estadoGeral = estado.copy(opcaoSelecionada = opcao, pontos = novosPontos)
 
         // Espera 1s para o usuário ver verde/vermelho e então avança
         viewModelScope.launch {
@@ -79,8 +115,8 @@ class QuizViewModel : ViewModel() {
     }
 
     private fun avancar() {
-        val estado = uiState
-        uiState = if (estado.indice < perguntas.size - 1) {
+        val estado = estadoGeral
+        estadoGeral = if (estado.indice < perguntas.size - 1) {
             estadoDaPergunta(estado.indice + 1, estado.pontos)
         } else {
             estado.copy(opcaoSelecionada = null, finalizado = true)

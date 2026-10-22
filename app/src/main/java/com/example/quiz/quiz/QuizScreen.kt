@@ -1,5 +1,7 @@
 package com.example.quiz.quiz
 
+import android.R.attr.fontWeight
+import android.widget.Button
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,35 +31,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.quiz.R
 import com.example.quiz.components.CardPergunta
+import com.example.quiz.home.HomeViewModel
 import com.example.quiz.quiz.QuizViewModel
 
 
 @Composable
 fun QuizScreen(
     nomeJogador: String,
+    navController: NavController,
     modifier: Modifier = Modifier,
     quizViewModel: QuizViewModel = viewModel()
 ) {
-    val estado = quizViewModel.uiState
+    val estado = quizViewModel.estadoGeral
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(color = colorResource(R.color.pink_white))
-            .padding(16.dp),
+            .background(color = colorResource(R.color.blue_white))
+            .padding(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         if (!estado.finalizado) {
             Image(
-                modifier = Modifier.size(70.dp),
+                modifier = Modifier.size(80.dp),
                 painter = painterResource(R.drawable.quiz),
                 contentDescription = "logo quiz"
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             Box(
                 modifier = Modifier
@@ -80,7 +87,7 @@ fun QuizScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             CardPergunta(
                 pergunta = estado.perguntaAtual.titulo,
@@ -93,21 +100,27 @@ fun QuizScreen(
             ResultadoContent(
                 nomeJogador = nomeJogador,
                 pontos = estado.pontos,
-                total = estado.total
+                total = estado.total,
+                navController = navController
             )
         }
     }
 }
 
 @Composable
-private fun ResultadoContent(nomeJogador: String, pontos: Int, total: Int) {
+private fun ResultadoContent(
+    nomeJogador: String,
+    pontos: Int,
+    total: Int,
+    navController: NavController
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            modifier = Modifier.size(70.dp),
+            modifier = Modifier.size(100.dp),
             painter = painterResource(R.drawable.quiz),
             contentDescription = "logo quiz"
         )
@@ -115,15 +128,14 @@ private fun ResultadoContent(nomeJogador: String, pontos: Int, total: Int) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
-                .background(color = colorResource(R.color.blue_white)),
+                .height(300.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
-                    .width(250.dp)
-                    .height(60.dp)
+                    .width(330.dp)
+                    .height(70.dp)
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(color = Color(0xFF62DB96)),
@@ -135,11 +147,55 @@ private fun ResultadoContent(nomeJogador: String, pontos: Int, total: Int) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(50.dp))
+
             Text(
                 text = "Você acertou $pontos de $total perguntas",
-                fontSize = 20.sp
+                fontSize = 25.sp
+            )
+
+            Spacer(modifier = Modifier.height(50.dp))
+
+            BotaoVoltar(
+                onClick = {
+                    navController.navigate("home") {
+                        popUpTo("home") {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
+    }
+}
+
+@Composable
+fun BotaoVoltar(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .height(80.dp)
+            .width(250.dp)
+            .padding(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorResource(R.color.teal_200)
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 2.dp,
+            color = Color.Gray
+        )
+    ) {
+        Text(
+            text = "TENTAR NOVAMENTE",
+            textAlign = TextAlign.Center,
+            color = Color.Black,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Normal
+        )
     }
 }
